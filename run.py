@@ -51,9 +51,11 @@ def format_times(day, night):
     night_result = []
     for time in day.split(":"):
         day_result.append("{:02d}".format(int(time)))
+    day_result.append("00")
     
     for time in night.split(":"):
         night_result.append("{:02d}".format(int(time)))
+    night_result.append("00")
     
     return [':'.join(day_result), ':'.join(night_result)]
 
@@ -63,8 +65,13 @@ def format_times(day, night):
 def set_times():
     clear_screen()
     print("Enter inputs in 24 hour format (HH:mm)")
-    day = input("Input day time: ")
-    night = input("Input night time: ")
+    print("Type menu to go menu")
+    day = input("Input day time: ").lower()
+    if (day == "menu"):
+        command_handler(day)
+    night = input("Input night time: ").lower()
+    if (night == "menu"):
+        command_handler(night)
     validate = validate_times(day, night)
     if (validate):
         day, night = format_times(day, night)

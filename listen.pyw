@@ -46,27 +46,42 @@ def change_theme(theme):
                '/v', f'AppsUseLightTheme', '/t', 'REG_DWORD', '/d', value, '/f']
     subprocess.run(command)
 
-def check_times():
+def check_times(first=False):
     times = get_data()
     day = datetime.strptime(times['day'], "%H:%M:%S").time()
     night = datetime.strptime(times['night'], "%H:%M:%S").time()
-    current_time = datetime.strptime(datetime.strftime(datetime.now(), "%H:%M%S"), "%H:%M:%S").time()
+    current_time = datetime.strptime(datetime.strftime(datetime.now(), "%H:%M:%S"), "%H:%M:%S").time()
     orders = ["Dark", "Light"] if day > night else ["Light", "Dark"]
     times = sorted([day, night, current_time])
     if (current_time == day):
         change_theme("Light")
     elif (current_time == night):
         change_theme("Dark")
-    if ((current_time > day and current_time > night) or (current_time < day and current_time < night)):
-        change_theme(orders[1])
-    elif (times.index(current_time) == 1):
-        change_theme(orders[0])
+    if (first):
+        if ((current_time > day and current_time > night) or (current_time < day and current_time < night)):
+            change_theme(orders[1])
+        elif (times.index(current_time) == 1):
+            change_theme(orders[0])
 
 
 def listen():
+    check_times(first=True)
+    curtime = datetime.now()
+    old_data = get_data()
     while (True):
         check_times()
         time.sleep(1)
+        diff = (datetime.now() - curtime).total_seconds()
+        if (diff > 10):
+            check_times(first=True)
+            print("AA")
+        curtime = datetime.now()
+        new_data = get_data()
+        if (new_data != old_data):
+            old_data = new_data
+            check_times(first=True)
+        else:
+            old_data = get_data()
 
 def main():
     data = get_data()
